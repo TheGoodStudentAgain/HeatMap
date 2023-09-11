@@ -1,21 +1,10 @@
-import plotly.express as px
+import numpy as np
+import datetime
+import plotly.graph_objects as go
+from plotly.offline import plot
 
-df = px.data.carshare()
-print(df['centroid_lon'])
-print(df['centroid_lat'])
-print(df)
-
-fig = px.scatter_mapbox(df,
-                        lon = df['centroid_lon'],
-                        lat = df['centroid_lat'],
-                        zoom = 10,
-                        color = df['peak_hour'],
-                        size = df['car_hours'],
-                        width = 1200,
-                        height = 900,
-                        title = 'text',
-                        )
-
-fig.update_layout(mapbox_style = 'open-street-map')
-fig.update_layout(margin = {'r':0, 't':50, 'l':0, 'b':10})
-fig.show()
+trace = go.Heatmap(z = [[1, 20, 30],
+                        [20, 1, 60],
+                        [30, 60, 1]])
+data = [trace]
+plot(data, filename = 'basic-heatmap.html')

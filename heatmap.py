@@ -5,7 +5,6 @@ print(df['centroid_lon'])
 print(df['centroid_lat'])
 print(df)
 
-
 fig = px.scatter_mapbox(df,
                         lon = df['centroid_lon'],
                         lat = df['centroid_lat'],

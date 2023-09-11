@@ -5,10 +5,23 @@ from zipfile import ZipFile
 with ZipFile('gtfs_stm.zip') as myzip:
     stops_df = pd.read_csv(myzip.open('stops.txt'))
 
+<<<<<<< HEAD:heatmap.py
 print(stops_df.head(1))
 
 def getSmallestLatLon(): # South-West
     return stops_df[['stop_lat', 'stop_lon']].min()
+=======
+fig = px.scatter_mapbox(df,
+                        lon = df['centroid_lon'],
+                        lat = df['centroid_lat'],
+                        zoom = 10,
+                        color = df['peak_hour'],
+                        size = df['car_hours'],
+                        width = 1200,
+                        height = 900,
+                        title = 'text',
+                        )
+>>>>>>> 6287d19428b507dcd6124d023376d970d478df1a:testmap.py
 
 def getBiggestLatLon(): # North-East
     return stops_df[['stop_lat', 'stop_lon']].max()

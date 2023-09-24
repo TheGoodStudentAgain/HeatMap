@@ -1,11 +1,12 @@
 import plotly.graph_objects as go
 import plotly.express as px
-from plotly.offline import plot
+import plotly.io as pio
 from math import ceil, floor
 import pandas as pd
 import numpy as np
 from zipfile import ZipFile
 from PIL import Image
+import glob
 
 with ZipFile('gtfs_stm.zip') as myzip:
     stops_df = pd.read_csv(myzip.open('stops.txt'))
@@ -20,7 +21,7 @@ def getNbStopsInDegreeOnDegree(x, y, degree):
 
 current_x = min_lat
 current_y = min_lon
-degree = 0.001
+degree = 0.01
 
 xindex = 0
 yindex = 0
@@ -30,48 +31,59 @@ max_lat_int = ceil(max_lat/degree)
 min_lon_int = floor(min_lon/degree)
 max_lon_int = ceil(max_lon/degree)
 
-print(min_lat_int, max_lat_int, min_lon_int, max_lon_int)
-
 listStats = [[0 for x in range(min_lon_int, max_lon_int)] for y in range(min_lat_int, max_lat_int)]
 
-while (current_x < max_lat):
-    while (current_y < max_lon):
-        listStats[xindex][yindex] = getNbStopsInDegreeOnDegree(current_x, current_y, degree)
-        yindex += 1
-        current_y += degree
-    current_x += degree
-    xindex += 1
-    current_y = min_lon
-    yindex = 0
+index = 1
+while index <= 5:
+    while (current_x < max_lat):
+        while (current_y < max_lon):
+            listStats[xindex][yindex] = getNbStopsInDegreeOnDegree(current_x, current_y, degree)
+            yindex += 1
+            current_y += degree
+        current_x += degree
+        xindex += 1
+        current_y = min_lon
+        yindex = 0
 
-print(len(listStats), len(listStats[0]))
+    print(len(listStats), len(listStats[0]))
 
-data = np.array(listStats)
-mask = data == 0
-colors = np.where(mask, 'rgba(0,0,0,0)', data)
-heatmap = go.Heatmap(z=colors)
+    data = np.array(listStats)
+    mask = data == 0
+    colors = np.where(mask, 'rgba(0,0,0,0)', data)
+    heatmap = go.Heatmap(z=colors)
 
-data = [heatmap]
+    data = [heatmap]
 
-image = Image.open('map2.jpg')
+    image = Image.open('map2.jpg')
 
-layout = go.Layout(
-    images= [
-        go.layout.Image(
-            source=image,
-            x=0,
-            y=0,
-            xref="paper",
-            yref="paper",
-            xanchor="left",
-            yanchor="bottom",
-            sizex=1,
-            sizey=1,
-            opacity=0.5,
-    )],
-    title='STM stops heatmap',
-    width=880,
-    height=800,
-)
-figure = go.Figure(data, layout)
-plot(figure, filename='heatmapTest.html')
+    layout = go.Layout(
+        images= [
+            go.layout.Image(
+                source=image,
+                x=0,
+                y=0,
+                xref="paper",
+                yref="paper",
+                xanchor="left",
+                yanchor="bottom",
+                sizex=1,
+                sizey=1,
+                opacity=0.5,
+        )],
+        title='STM stops heatmap',
+        width=880,
+        height=800,
+    )
+    figure = go.Figure(data, layout)
+    pio.write_image(figure, 'heatmap{}.png'.format(index))
+    index += 1
+
+image_files = sorted(glob.glob('heatmap*.png'))
+
+images = []
+for image_file in image_files:
+    img = Image.open(image_file)
+    images.append(img)
+
+
+images[0].save('heatmap_animation.gif', save_all=True, append_images=images[1:], duration=500, loop=0)

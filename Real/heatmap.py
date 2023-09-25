@@ -38,9 +38,17 @@ def get_filtered_merged_df(datetime_start, datetime_end):
 
     return merged_df_filtered
 
+def removeMetroTrips(df):
+    return df[(df['route_id'] != '1') & 
+               (df['route_id'] != '2') & 
+               (df['route_id'] != '4') & 
+               (df['route_id'] != '5')]
+
 def getStopTimesWithinTimeWindow(datetime, time_window):
     time_window_start, time_window_end = get_time_window(datetime, time_window)
     merged_df_filtered = get_filtered_merged_df(time_window_start, time_window_end)
+
+    no_metro_df = removeMetroTrips(merged_df_filtered)
 
     string_time_start = time_window_start.time().strftime('%H:%M:%S')
     string_time_end = time_window_end.time().strftime('%H:%M:%S')
@@ -48,9 +56,9 @@ def getStopTimesWithinTimeWindow(datetime, time_window):
     time_start = pd.to_datetime(string_time_start, format='%H:%M:%S')
     time_end = pd.to_datetime(string_time_end, format='%H:%M:%S')
 
-    filtered_df = merged_df_filtered[
-        (merged_df_filtered['arrival_time'] >= time_start) &
-        (merged_df_filtered['arrival_time'] <= time_end)]
+    filtered_df = no_metro_df[
+        (no_metro_df['arrival_time'] >= time_start) &
+        (no_metro_df['arrival_time'] <= time_end)]
 
     return filtered_df
 
@@ -59,6 +67,7 @@ def get_trips_in_time_window(filtered_df, stops):
     filtered_df_stop_filter = filtered_df[filtered_df['stop_id'].isin(stopseries)]
 
     unique_trip_df = filtered_df_stop_filter.drop_duplicates(subset='trip_id')
+
 
     trips_in_time_window = unique_trip_df.shape[0]
     return trips_in_time_window

@@ -116,7 +116,7 @@ programStartTime = time.time()
 
 datetime_windows = [specific_dateTime + pd.to_timedelta(15 * i, unit="m") for i in range(100)]
 
-image = Image.open('map2.jpg')
+image = Image.open('realmap.jpg')
 
 index = 1
 while index <= 96:

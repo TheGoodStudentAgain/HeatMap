@@ -132,7 +132,7 @@ while index <= 96:
     data = np.array(listStats)
     mask = data == 0
     colors = np.where(mask, 'rgba(0,0,0,0)', data)
-    heatmap = go.Heatmap(z=colors, zmin=0, zmax=30)
+    heatmap = go.Heatmap(z=colors, zmin=0, zmax=10)
     data = [heatmap]
 
     layout = go.Layout(
